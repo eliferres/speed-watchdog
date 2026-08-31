@@ -1,0 +1,3 @@
+Never write outside the workspace.
+Ask before deleting anything.
+Prefer the smallest change that works.

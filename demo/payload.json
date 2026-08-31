@@ -1,0 +1,6 @@
+{
+  "session": "demo",
+  "tool": "shell",
+  "input": {"command": "ls -la"},
+  "cwd": "/workspace"
+}
