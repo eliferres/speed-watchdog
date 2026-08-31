@@ -1,0 +1,9 @@
+{
+  "set_at": "2026-06-05",
+  "window_days": 7,
+  "medians": {
+    "context_inject": 60.1,
+    "payload_check": 41.9,
+    "rules_lint": 18.0
+  }
+}

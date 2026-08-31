@@ -1,0 +1,27 @@
+{
+  "runs_per_probe": 3,
+  "window_days": 7,
+  "timeout_s": 30,
+  "history": "history.jsonl",
+  "baseline": "baseline.json",
+  "probes": [
+    {
+      "name": "rules_lint",
+      "command": "sh hooks/load-rules.sh",
+      "unit": "wall-clock ms to read and lint the rules file at session start",
+      "threshold_pct": 20
+    },
+    {
+      "name": "payload_check",
+      "command": "sh hooks/check-payload.sh",
+      "unit": "wall-clock ms for the pre-tool hook to inspect one canned tool call",
+      "threshold_pct": 20
+    },
+    {
+      "name": "context_inject",
+      "command": "sh hooks/inject-context.sh",
+      "unit": "wall-clock ms for the context-injection hook on one canned turn",
+      "threshold_pct": 20
+    }
+  ]
+}
