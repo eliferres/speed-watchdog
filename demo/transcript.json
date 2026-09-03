@@ -1,0 +1,12 @@
+[
+  {
+    "cmd": "python3 watchdog.py validate --config demo/watchdog.json",
+    "out": "config OK: 3 probes, 3 runs each, 7-day window\n  rules_lint  (alarm at +20%)\n    measures: wall-clock ms to read and lint the rules file at session start\n    command:  sh hooks/load-rules.sh\n  payload_check  (alarm at +20%)\n    measures: wall-clock ms for the pre-tool hook to inspect one canned tool call\n    command:  sh hooks/check-payload.sh\n  context_inject  (alarm at +20%)\n    measures: wall-clock ms for the context-injection hook on one canned turn\n    command:  sh hooks/inject-context.sh",
+    "status": 0
+  },
+  {
+    "cmd": "python3 watchdog.py report --config demo/watchdog.json --now 2026-06-14",
+    "out": "speed-watchdog  window=7d  now=2026-06-14  baseline frozen 2026-06-05\n  ok    rules_lint               recent     18.1 ms   baseline     18.0 ms     +0.6%  (limit +20%, 7 runs)\n  ALARM context_inject           recent     80.4 ms   baseline     60.1 ms    +33.8%  (limit +20%, 7 runs)\nALARM: 1 probe(s) slower than the frozen baseline. Find what was added, or re-baseline deliberately.",
+    "status": 1
+  }
+]
