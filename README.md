@@ -12,6 +12,8 @@ Python 3.9+, standard library only, one file.
 
 ![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
 
+<img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
+
 ## Quick start
 
 ```bash
