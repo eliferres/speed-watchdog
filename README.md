@@ -1,12 +1,6 @@
 # speed-watchdog
 
-An agent harness gets slow the way a house gets cluttered: one hook, one
-gate, one "tiny" startup file at a time, each too small to argue with.
-Six months later every turn drags and nobody can say when it happened.
-This is the meter that can. Probes are plain commands whose wall-clock
-time is the metric, so it works on any harness. It records medians,
-compares them against a baseline that moves only when you say so, and
-exits non-zero the day something got slower.
+An agent harness gets slow one small hook at a time, and six months later nobody can say when it happened. speed-watchdog is the meter. Probes are plain commands timed by wall clock, medians are compared against a baseline that moves only when you say so, and the day something gets slower it exits non-zero.
 
 Python 3.9+, standard library only, one file.
 
