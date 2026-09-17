@@ -62,8 +62,8 @@ def picture_rows():
     """The text rows of the picture, as (class, text), title bar dropped."""
     rows = []
     for element in ET.parse(PICTURE).getroot().iter(SVG_TEXT):
-        if element.get("font-size") == "14":
-            continue  # the window title bar, not session output
+        if element.get("font-size"):
+            continue  # the window title bar, the one row with its own size
         text = "".join(element.itertext())
         classes = [element.get("class")] + [t.get("class") for t in element]
         rows.append(("cmd" if "p" in classes else element.get("class"), text))
