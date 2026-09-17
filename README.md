@@ -11,11 +11,25 @@ Python 3.9+, standard library only, one file.
 ## Quick start
 
 ```bash
+pipx install git+https://github.com/eliferres/speed-watchdog
+```
+
+That puts a `speed-watchdog` command on your path. The tool is not on
+PyPI, so the install reads the repository directly. Python 3.9 or newer.
+
+The demo config and its canned history live in the repository, so clone
+it to follow the walkthrough:
+
+```bash
 git clone https://github.com/eliferres/speed-watchdog.git
 cd speed-watchdog
 python3 speed_watchdog.py validate --config demo/watchdog.json
 python3 speed_watchdog.py report   --config demo/watchdog.json --now 2026-06-14
 ```
+
+Installed, the command name stands in for `python3 speed_watchdog.py`:
+`speed-watchdog report --config demo/watchdog.json --now 2026-06-14`
+does the same thing from anywhere.
 
 That second command reads 14 days of canned history shipped in `demo/`
 and exits 1, because one of the demo's fictional hooks got slower. The

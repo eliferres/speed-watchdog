@@ -20,6 +20,8 @@ Usage:
 
 from __future__ import annotations
 
+__version__ = "1.1.0"
+
 import argparse
 import json
 import statistics
@@ -319,6 +321,7 @@ COMMANDS = {
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--version", action="version", version=f"speed-watchdog {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
     for name in COMMANDS:
         sub = subparsers.add_parser(name)

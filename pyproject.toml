@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speed-watchdog"
+dynamic = ["version"]
+description = "A meter for an agent harness's own overhead, built from probes that are plain commands"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Eli Ferres" }]
+
+[project.urls]
+Source = "https://github.com/eliferres/speed-watchdog"
+Changelog = "https://github.com/eliferres/speed-watchdog/blob/main/CHANGELOG.md"
+
+[project.scripts]
+speed-watchdog = "speed_watchdog:main"
+
+[tool.setuptools]
+py-modules = ["speed_watchdog"]
+
+[tool.setuptools.dynamic]
+version = { attr = "speed_watchdog.__version__" }

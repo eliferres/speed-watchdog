@@ -23,3 +23,9 @@ jobs:
         run: python3 speed_watchdog.py validate --config demo/watchdog.json
       - name: Meter the demo hooks for real
         run: python3 speed_watchdog.py run --config demo/watchdog.json
+      - name: Install the package
+        run: python -m pip install .
+      - name: Check the installed command
+        run: speed-watchdog --version
+      - name: Validate the demo config through the installed command
+        run: speed-watchdog validate --config demo/watchdog.json
