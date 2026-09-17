@@ -59,14 +59,24 @@ def replay(entries):
 
 
 def picture_rows():
-    """The text rows of the picture, as (class, text), title bar dropped."""
+    """The text rows of the picture, in order, as (kind, text).
+
+    kind is "cmd" for the prompted first row of a command, "cont" for its
+    backslash continuation row, and "out" for an output row. The title bar is
+    dropped: it is the one row carrying its own font size.
+    """
     rows = []
     for element in ET.parse(PICTURE).getroot().iter(SVG_TEXT):
         if element.get("font-size"):
             continue  # the window title bar, the one row with its own size
         text = "".join(element.itertext())
         classes = [element.get("class")] + [t.get("class") for t in element]
-        rows.append(("cmd" if "p" in classes else element.get("class"), text))
+        if "p" in classes:
+            rows.append(("cmd", text.removeprefix("$")))
+        elif element.get("class") == "cmd":
+            rows.append(("cont", text[4:] if text.startswith("    ") else text))
+        else:
+            rows.append(("out", text))
     return rows
 
 
@@ -102,17 +112,25 @@ class DemoTranscriptTest(unittest.TestCase):
         for marker in ("/Users/", "/var/folders", "/private/var", "/tmp/tmp"):
             self.assertNotIn(marker, raw)
 
-    def test_every_picture_row_comes_from_the_transcript(self):
+    def test_the_picture_shows_whole_entries_in_order(self):
+        """Nothing invented, nothing left out, nothing out of order.
+
+        The picture holds as many whole entries as it fits, so it may stop
+        before the last one, but only between commands: every non-empty output
+        line of an entry it shows is drawn, in order, and no drawn row is left
+        unaccounted for at the end.
+        """
         rows = picture_rows()
+        self.assertGreater(len(rows), 0, "the picture has no session rows")
         index = 0
         for entry in self.entries:
-            if index >= len(rows):
-                break  # the picture shows the first N rows only
+            if index == len(rows):
+                break  # the picture stopped at a command boundary
             self.assertEqual(rows[index][0], "cmd", f"expected a prompt row for {entry['cmd']}")
-            chunks = [rows[index][1].removeprefix("$")]
+            chunks = [rows[index][1]]
             index += 1
-            while index < len(rows) and rows[index][0] == "cmd":
-                chunks.append(rows[index][1].strip())
+            while index < len(rows) and rows[index][0] == "cont":
+                chunks.append(rows[index][1])
                 index += 1
             # Wrapped command rows end in " \" and rejoin with one space.
             rebuilt = " ".join(c[:-2] if c.endswith(" \\") else c for c in chunks)
@@ -121,12 +139,15 @@ class DemoTranscriptTest(unittest.TestCase):
             for line in entry["out"].splitlines():
                 if not line.strip():
                     continue
-                if index >= len(rows) or rows[index][0] == "cmd":
-                    break
+                self.assertLess(index, len(rows),
+                                f"the picture stops inside {entry['cmd']}, before {line!r}")
+                self.assertEqual(rows[index][0], "out",
+                                 f"row {index + 1} should be the output line {line!r}")
                 self.assertTrue(is_prefix(rows[index][1], line),
                                 f"picture row {rows[index][1]!r} is not the start of {line!r}")
                 index += 1
-        self.assertGreater(len(rows), 0)
+        self.assertEqual(index, len(rows),
+                         f"{len(rows) - index} drawn row(s) the transcript does not account for")
 
 
 if __name__ == "__main__":
