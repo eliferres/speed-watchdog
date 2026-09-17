@@ -11,6 +11,7 @@
 
 ### Changed
 - Renamed `watchdog.py` to `speed_watchdog.py`, so an install of this tool cannot shadow the widely used `watchdog` package; the hint lines in `report` now name the command you typed instead of a fixed file name.
+- The README now says what a report with only `WARN` lines does today: the verdict line still reads `PASS` and the exit code is still 0.
 - The README leads with installing, and the walkthrough, the config reference and what the report refuses now sit under headings that say what they hold.
 
 ## [1.1.0](https://github.com/eliferres/speed-watchdog/releases/tag/v1.1.0) - 2026-09-03
