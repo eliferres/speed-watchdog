@@ -11,11 +11,11 @@ baseline that moves only when a human runs `baseline`.
 Stdlib only. Exit 1 on any alarm or error, 0 clean.
 
 Usage:
-    python watchdog.py validate [--config watchdog.json]
-    python watchdog.py run      [--config ...] [--runs K]
-    python watchdog.py report   [--config ...] [--now ISO-DATE]
-    python watchdog.py baseline [--config ...] [--now ISO-DATE]
-    python watchdog.py trend    [--config ...]
+    python speed_watchdog.py validate [--config watchdog.json]
+    python speed_watchdog.py run      [--config ...] [--runs K]
+    python speed_watchdog.py report   [--config ...] [--now ISO-DATE]
+    python speed_watchdog.py baseline [--config ...] [--now ISO-DATE]
+    python speed_watchdog.py trend    [--config ...]
 """
 
 from __future__ import annotations
@@ -212,7 +212,7 @@ def cmd_run(cfg: dict, args) -> int:
 def cmd_report(cfg: dict, args) -> int:
     baseline_path = resolve(cfg, "baseline")
     if not baseline_path.is_file():
-        print(f"FAIL {baseline_path}: no baseline yet - run `watchdog.py baseline` to freeze one")
+        print(f"FAIL {baseline_path}: no baseline yet - run `{args.prog} baseline` to freeze one")
         return 1
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
     frozen = baseline.get("medians", {})
@@ -231,7 +231,7 @@ def cmd_report(cfg: dict, args) -> int:
             print(f"  WARN  {name:<24} no runs in the last {window} days")
             continue
         if name not in frozen:
-            print(f"  WARN  {name:<24} not in the baseline - re-run `watchdog.py baseline`")
+            print(f"  WARN  {name:<24} not in the baseline - re-run `{args.prog} baseline`")
             continue
         median, count = recent[name]
         base = frozen[name]
@@ -333,7 +333,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    # Messages name the command the user actually typed, which differs
+    # between the checked-out file and the installed console script.
+    args.prog = parser.prog
 
     if getattr(args, "now", None) is not None:
         try:

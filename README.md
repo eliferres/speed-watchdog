@@ -13,8 +13,8 @@ Python 3.9+, standard library only, one file.
 ```bash
 git clone https://github.com/eliferres/speed-watchdog.git
 cd speed-watchdog
-python3 watchdog.py validate --config demo/watchdog.json
-python3 watchdog.py report   --config demo/watchdog.json --now 2026-06-14
+python3 speed_watchdog.py validate --config demo/watchdog.json
+python3 speed_watchdog.py report   --config demo/watchdog.json --now 2026-06-14
 ```
 
 That second command reads 14 days of canned history shipped in `demo/`
@@ -37,7 +37,7 @@ The median throws that sample away. The report medians again across the
 window, so a whole bad night cannot move the verdict on its own.
 
 **Frozen baselines.** The comparison point lives in `baseline.json` and
-changes only when a human runs `watchdog.py baseline`. A baseline that
+changes only when a human runs `speed_watchdog.py baseline`. A baseline that
 slid with a rolling average would absorb the exact drift it exists to
 catch: every day is 2% slower than yesterday, nothing ever alarms, and a
 year later everything takes twice as long.
@@ -92,7 +92,7 @@ numbers instead of watching them.
 where it alarms:
 
 ```console
-$ python3 watchdog.py validate --config demo/watchdog.json
+$ python3 speed_watchdog.py validate --config demo/watchdog.json
 config OK: 3 probes, 3 runs each, 7-day window
   rules_lint  (alarm at +20%)
     measures: wall-clock ms to read and lint the rules file at session start
@@ -109,7 +109,7 @@ config OK: 3 probes, 3 runs each, 7-day window
 so the output is the same on every machine and in every year:
 
 ```console
-$ python3 watchdog.py report --config demo/watchdog.json --now 2026-06-14
+$ python3 speed_watchdog.py report --config demo/watchdog.json --now 2026-06-14
 speed-watchdog  window=7d  now=2026-06-14  baseline frozen 2026-06-05
   ok    rules_lint               recent     18.1 ms   baseline     18.0 ms     +0.6%  (limit +20%, 7 runs)
   ok    payload_check            recent     42.0 ms   baseline     41.9 ms     +0.2%  (limit +20%, 7 runs)
@@ -123,7 +123,7 @@ $ echo $?
 jitter stays flat and only real drift climbs:
 
 ```console
-$ python3 watchdog.py trend --config demo/watchdog.json
+$ python3 speed_watchdog.py trend --config demo/watchdog.json
 speed-watchdog trend  (42 recorded runs, oldest first)
   rules_lint   (full height = +20%, its alarm threshold)
     ._.._.._..__..  17.9 -> 18.1 ms (min 17.6, max 18.5, 14 runs)
@@ -141,7 +141,7 @@ and appends today's rows, so your numbers will differ from these - the
 demo hooks sleep, and your process-spawn cost is your own:
 
 ```console
-$ python3 watchdog.py run --config demo/watchdog.json
+$ python3 speed_watchdog.py run --config demo/watchdog.json
   rules_lint                    22.7 ms   (median of 3)
   payload_check                 51.1 ms   (median of 3)
   context_inject               115.5 ms   (median of 3)
@@ -156,7 +156,7 @@ pass someone added to `demo/hooks/inject-context.sh`, and you decided to
 keep it. Only now does the number move:
 
 ```console
-$ python3 watchdog.py baseline --config demo/watchdog.json --now 2026-06-14
+$ python3 speed_watchdog.py baseline --config demo/watchdog.json --now 2026-06-14
   context_inject                80.4 ms   (median of 7 runs)
   payload_check                 42.0 ms   (median of 7 runs)
   rules_lint                    18.1 ms   (median of 7 runs)
@@ -166,7 +166,7 @@ OK: baseline frozen at 2026-06-14 in baseline.json
 **6. Clean.** Same history, same window, new frozen baseline:
 
 ```console
-$ python3 watchdog.py report --config demo/watchdog.json --now 2026-06-14
+$ python3 speed_watchdog.py report --config demo/watchdog.json --now 2026-06-14
 speed-watchdog  window=7d  now=2026-06-14  baseline frozen 2026-06-14
   ok    rules_lint               recent     18.1 ms   baseline     18.1 ms     +0.0%  (limit +20%, 7 runs)
   ok    payload_check            recent     42.0 ms   baseline     42.0 ms     +0.0%  (limit +20%, 7 runs)
@@ -182,7 +182,7 @@ $ echo $?
 
 | Path | Role |
 |---|---|
-| `watchdog.py` | The whole tool: `run`, `report`, `baseline`, `trend`, `validate`. |
+| `speed_watchdog.py` | The whole tool: `run`, `report`, `baseline`, `trend`, `validate`. |
 | `demo/watchdog.json` | A worked config: three probes, thresholds, units. |
 | `demo/history.jsonl` | 14 canned days, one probe regressing on day ten. |
 | `demo/baseline.json` | The frozen comparison point, set 2026-06-05. |
@@ -195,14 +195,14 @@ Point `probes` at your own harness, take a week of nightly runs, then
 freeze:
 
 ```bash
-python3 watchdog.py baseline --config watchdog.json
+python3 speed_watchdog.py baseline --config watchdog.json
 ```
 
 A nightly `run`, and a `report` that anyone will see when it fails:
 
 ```cron
-0 3 * * *  cd /path/to/harness && python3 watchdog.py run    --config watchdog.json
-5 3 * * *  cd /path/to/harness && python3 watchdog.py report --config watchdog.json
+0 3 * * *  cd /path/to/harness && python3 speed_watchdog.py run    --config watchdog.json
+5 3 * * *  cd /path/to/harness && python3 speed_watchdog.py report --config watchdog.json
 ```
 
 `report` exits 1 on any alarm, so cron mails it, CI fails on it, and a

@@ -18,7 +18,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-import watchdog  # noqa: E402
+import speed_watchdog  # noqa: E402
 
 
 def write_config(root: Path, probes=None, **overrides) -> Path:
@@ -57,7 +57,7 @@ def run_cli(*argv):
 
     buffer = StringIO()
     with redirect_stdout(buffer):
-        code = watchdog.main(list(argv))
+        code = speed_watchdog.main(list(argv))
     return code, buffer.getvalue()
 
 
@@ -72,7 +72,7 @@ class WatchdogTest(unittest.TestCase):
     def test_shipped_demo_report_alarms(self):
         # The README's headline claim, end to end through the CLI.
         proc = subprocess.run(
-            [sys.executable, str(REPO / "watchdog.py"), "report",
+            [sys.executable, str(REPO / "speed_watchdog.py"), "report",
              "--config", str(REPO / "demo" / "watchdog.json"), "--now", "2026-06-14"],
             capture_output=True, text=True,
         )
@@ -83,22 +83,22 @@ class WatchdogTest(unittest.TestCase):
     # ---- median math ----
 
     def test_median_ignores_one_slow_outlier(self):
-        entries = watchdog.read_history(self.write_rows([
+        entries = speed_watchdog.read_history(self.write_rows([
             ("2026-06-10T02:00:00", "fast", 10.0),
             ("2026-06-11T02:00:00", "fast", 900.0),
             ("2026-06-12T02:00:00", "fast", 11.0),
         ]))
-        medians = watchdog.window_medians(entries, datetime(2026, 6, 12), 7)
+        medians = speed_watchdog.window_medians(entries, datetime(2026, 6, 12), 7)
         self.assertEqual(medians["fast"], (11.0, 3))
 
     def test_median_of_even_count_averages_the_middle_pair(self):
-        entries = watchdog.read_history(self.write_rows([
+        entries = speed_watchdog.read_history(self.write_rows([
             ("2026-06-10T02:00:00", "fast", 10.0),
             ("2026-06-11T02:00:00", "fast", 20.0),
             ("2026-06-12T02:00:00", "fast", 30.0),
             ("2026-06-13T02:00:00", "fast", 60.0),
         ]))
-        medians = watchdog.window_medians(entries, datetime(2026, 6, 13), 7)
+        medians = speed_watchdog.window_medians(entries, datetime(2026, 6, 13), 7)
         self.assertEqual(medians["fast"], (25.0, 4))
 
     # ---- alarms ----
@@ -239,7 +239,7 @@ class WatchdogTest(unittest.TestCase):
         }
         for expected, probes in cases.items():
             with self.subTest(expected=expected):
-                errors = watchdog.validate_config({"probes": probes})
+                errors = speed_watchdog.validate_config({"probes": probes})
                 self.assertTrue(any(expected in e for e in errors), errors)
 
     def test_validate_accepts_the_shipped_demo_config(self):
