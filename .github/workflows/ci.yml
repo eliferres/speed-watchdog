@@ -20,6 +20,6 @@ jobs:
       - name: Run tests
         run: python3 -m unittest discover -s tests -v
       - name: Validate the shipped demo config
-        run: python3 watchdog.py validate --config demo/watchdog.json
+        run: python3 speed_watchdog.py validate --config demo/watchdog.json
       - name: Meter the demo hooks for real
-        run: python3 watchdog.py run --config demo/watchdog.json
+        run: python3 speed_watchdog.py run --config demo/watchdog.json
