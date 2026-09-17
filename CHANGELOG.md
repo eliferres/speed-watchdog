@@ -11,6 +11,7 @@
 
 ### Changed
 - Renamed `watchdog.py` to `speed_watchdog.py`, so an install of this tool cannot shadow the widely used `watchdog` package; the hint lines in `report` now name the command you typed instead of a fixed file name.
+- The README's exit-code sentence now lists exit 2, which is what a command line the parser rejects returns; it previously listed 0 and 1 only.
 - The README now says what a report with only `WARN` lines does today: the verdict line still reads `PASS` and the exit code is still 0.
 - The README leads with installing, and the walkthrough, the config reference and what the report refuses now sit under headings that say what they hold.
 
