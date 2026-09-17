@@ -6,7 +6,7 @@
   },
   {
     "cmd": "python3 speed_watchdog.py report --config demo/watchdog.json --now 2026-06-14",
-    "out": "speed-watchdog  window=7d  now=2026-06-14  baseline frozen 2026-06-05\n  ok    rules_lint               recent     18.1 ms   baseline     18.0 ms     +0.6%  (limit +20%, 7 runs)\n  ALARM context_inject           recent     80.4 ms   baseline     60.1 ms    +33.8%  (limit +20%, 7 runs)\nALARM: 1 probe(s) slower than the frozen baseline. Find what was added, or re-baseline deliberately.",
+    "out": "speed-watchdog  window=7d  now=2026-06-14  baseline frozen 2026-06-05\n  ok    rules_lint               recent     18.1 ms   baseline     18.0 ms     +0.6%  (limit +20%, 7 runs)\n  ok    payload_check            recent     42.0 ms   baseline     41.9 ms     +0.2%  (limit +20%, 7 runs)\n  ALARM context_inject           recent     80.4 ms   baseline     60.1 ms    +33.8%  (limit +20%, 7 runs)\nALARM: 1 probe(s) slower than the frozen baseline. Find what was added, or re-baseline deliberately.",
     "status": 1
   }
 ]
