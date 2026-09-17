@@ -7,6 +7,7 @@
 
 ### Fixed
 - The demo transcript and the terminal picture now show the report's full output, including the payload_check line that was missing, and a test replays every demo command to keep them honest.
+- The demo picture no longer cuts its long lines off at the right edge: rows wider than the box ran past it mid-word with no ellipsis. Only the drawing changed; the recorded session is untouched.
 
 ### Changed
 - Renamed `watchdog.py` to `speed_watchdog.py`, so an install of this tool cannot shadow the widely used `watchdog` package; the hint lines in `report` now name the command you typed instead of a fixed file name.
