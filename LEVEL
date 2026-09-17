@@ -1,0 +1,10 @@
+# What this project is responsible for, and what happens when it breaks.
+level: 1
+owner: Eli Ferres
+monitor: GitHub Actions on every push and pull request; the badge in the README is the health signal. Failures surface as issues.
+rollback: git revert, then re-tag. Installed copies are pinned to a version and are unaffected until the user upgrades.
+migrations: n/a: the tool owns no database and no schema.
+backups: n/a: timings are local history. Losing them costs the comparison, not correctness; the next run rebuilds a baseline.
+authz: n/a: no server and no trust boundary. It runs locally, as whoever invoked it, with exactly their permissions.
+logs: n/a: a command-line tool that prints its findings and exits. Its output is the log, and the caller decides where it goes.
+alerts: a measurement past its agreed limit exits non-zero, which is how the schedule that runs it raises a human.
