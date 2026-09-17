@@ -220,8 +220,9 @@ baseline.
 - **A baseline that drifts.** Nothing except `baseline` writes
   `baseline.json`. There is no auto-update flag to turn on in a hurry.
 - **A silent gap.** A probe with no runs in the window is printed as a
-  `WARN` line, so a meter that quietly stopped is visible rather than
-  reported as healthy.
+  `WARN` line, so a meter that quietly stopped shows up in the report.
+  The verdict line and the exit code follow the thresholds only: a report
+  with `WARN` lines and no alarm still ends in `PASS` and exit 0.
 - **A one-night fluke.** Two layers of median - across the K runs and
   across the window's days - stand between a slow night and an alarm.
 - **An unreadable history.** One JSON object per line, dated, with the
