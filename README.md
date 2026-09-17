@@ -4,11 +4,11 @@ An agent harness gets slow one small hook at a time, and six months later nobody
 
 Python 3.9+, standard library only, one file.
 
-![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
-
 <img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
 
-## Quick start
+![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
+
+## Install
 
 ```bash
 pipx install git+https://github.com/eliferres/speed-watchdog
@@ -17,8 +17,10 @@ pipx install git+https://github.com/eliferres/speed-watchdog
 That puts a `speed-watchdog` command on your path. The tool is not on
 PyPI, so the install reads the repository directly. Python 3.9 or newer.
 
-The demo config and its canned history live in the repository, so clone
-it to follow the walkthrough:
+The tool is one file, `speed_watchdog.py`. The demo it ships with is a
+worked config, 14 canned days of history, the baseline they are compared
+against and three fictional shell hooks, all under `demo/`, so clone the
+repository to follow the walkthrough:
 
 ```bash
 git clone https://github.com/eliferres/speed-watchdog.git
@@ -33,10 +35,10 @@ does the same thing from anywhere.
 
 That second command reads 14 days of canned history shipped in `demo/`
 and exits 1, because one of the demo's fictional hooks got slower. The
-[walkthrough](#the-walkthrough) below runs the whole loop offline. Then
+[walkthrough](#walkthrough-catching-a-slow-hook) below runs the whole loop offline. Then
 point `probes` at your own harness and put `run` on a nightly schedule.
 
-## The four ideas
+## How it measures
 
 **A probe is a command.** Whatever you can time from a shell, you can
 meter: a hook chain against a canned payload, a cold CLI start, a lint of
@@ -61,42 +63,7 @@ did this get slow" has an answer you can read off `trend`. That only
 holds if the meter runs on a schedule and every addition to the harness
 arrives with a probe. The tool cannot enforce that part; you do.
 
-## The config, verbatim
-
-One probe entry is the whole contract. This is `demo/watchdog.json`,
-trimmed to one probe:
-
-```json
-{
-  "runs_per_probe": 3,
-  "window_days": 7,
-  "timeout_s": 30,
-  "history": "history.jsonl",
-  "baseline": "baseline.json",
-  "probes": [
-    {
-      "name": "context_inject",
-      "command": "sh hooks/inject-context.sh",
-      "unit": "wall-clock ms for the context-injection hook on one canned turn",
-      "threshold_pct": 20
-    }
-  ]
-}
-```
-
-`name`, `command`, and `threshold_pct` are required; everything else has
-the default shown above. Paths are relative to the config file, and
-commands run with the config file's directory as their working
-directory, so a checked-in config works from anywhere.
-
-Each `run` appends one line per probe to the history, and that line is
-the entire storage format:
-
-```json
-{"ts": "2026-06-14T02:00:00", "probe": "context_inject", "median_ms": 96.2, "runs": 3}
-```
-
-## The walkthrough
+## Walkthrough: catching a slow hook
 
 Every command below runs from a fresh clone with no setup. There is no
 animated demo on purpose: the demo is executable, so you can check these
@@ -192,16 +159,40 @@ $ echo $?
 
 `git checkout demo/` puts the demo back for the next reader.
 
-## What is in the box
+## Config reference
 
-| Path | Role |
-|---|---|
-| `speed_watchdog.py` | The whole tool: `run`, `report`, `baseline`, `trend`, `validate`. |
-| `demo/watchdog.json` | A worked config: three probes, thresholds, units. |
-| `demo/history.jsonl` | 14 canned days, one probe regressing on day ten. |
-| `demo/baseline.json` | The frozen comparison point, set 2026-06-05. |
-| `demo/hooks/` | A fictional harness: three shell hooks with known costs. |
-| `tests/test_watchdog.py` | Real configs and histories in temp dirs, no mocks. |
+One probe entry is the whole contract. This is `demo/watchdog.json`,
+trimmed to one probe:
+
+```json
+{
+  "runs_per_probe": 3,
+  "window_days": 7,
+  "timeout_s": 30,
+  "history": "history.jsonl",
+  "baseline": "baseline.json",
+  "probes": [
+    {
+      "name": "context_inject",
+      "command": "sh hooks/inject-context.sh",
+      "unit": "wall-clock ms for the context-injection hook on one canned turn",
+      "threshold_pct": 20
+    }
+  ]
+}
+```
+
+`name`, `command`, and `threshold_pct` are required; everything else has
+the default shown above. Paths are relative to the config file, and
+commands run with the config file's directory as their working
+directory, so a checked-in config works from anywhere.
+
+Each `run` appends one line per probe to the history, and that line is
+the entire storage format:
+
+```json
+{"ts": "2026-06-14T02:00:00", "probe": "context_inject", "median_ms": 96.2, "runs": 3}
+```
 
 ## Wiring it in
 
@@ -251,7 +242,3 @@ baseline.
   actually observe in `trend`, not from a round number.
 - One machine, one history file. Comparing numbers across machines with
   different hardware is not meaningful, and the tool does not try.
-
-## License
-
-MIT
