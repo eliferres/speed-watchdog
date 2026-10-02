@@ -137,6 +137,29 @@ class WatchdogTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("no baseline yet", out)
 
+    def test_unreadable_baseline_exits_2_on_stderr(self):
+        config = write_config(self.root)
+        write_history(self.root, [("2026-06-12T02:00:00", "fast", 11.0)])
+        path = self.root / "baseline.json"
+        for body in ("{not json", "[]", '{"medians": []}', '{"medians": {"fast": "ten"}}',
+                     '{"medians": {"fast": true}}'):
+            with self.subTest(body=body):
+                path.write_text(body, encoding="utf-8")
+                code, out, err = run_cli_streams("report", "--config", str(config), "--now", "2026-06-12")
+                self.assertEqual(code, 2)
+                self.assertEqual(out, "")
+                self.assertEqual(1, len(err.splitlines()))
+                self.assertIn(str(path), err)
+
+    def test_zero_baseline_median_warns_instead_of_dividing(self):
+        config = write_config(self.root)
+        write_history(self.root, [("2026-06-12T02:00:00", "fast", 11.0)])
+        write_baseline(self.root, {"fast": 0})
+        code, out, err = run_cli_streams("report", "--config", str(config), "--now", "2026-06-12")
+        self.assertEqual(code, 0, out + err)
+        self.assertIn("WARN  fast", out)
+        self.assertIn("baseline median is 0", out)
+
     # ---- the baseline moves only on command ----
 
     def test_report_and_run_never_move_the_baseline(self):

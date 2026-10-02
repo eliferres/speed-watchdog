@@ -6,6 +6,8 @@
 - Installable with `pipx install git+https://github.com/eliferres/speed-watchdog`, which puts a `speed-watchdog` command on your path; `speed-watchdog --version` prints the version.
 
 ### Fixed
+- `report` no longer crashes on a probe whose baseline median is 0 ms: it prints a `WARN` line for that probe and skips the percentage.
+- `report` with a `baseline.json` that will not parse, or that holds a median that is not a number, no longer crashes with a traceback: it prints one line on stderr naming the file and exits 2.
 - The walkthrough no longer says the README has no demo picture; it now says the picture at the top shows its first two steps.
 - The demo transcript and the terminal picture now show the report's full output, including the payload_check line that was missing, and a test replays every demo command to keep them honest.
 - The demo picture no longer cuts its long lines off at the right edge: rows wider than the box ran past it mid-word with no ellipsis. Only the drawing changed; the recorded session is untouched.

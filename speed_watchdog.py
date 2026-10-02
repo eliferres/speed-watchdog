@@ -211,13 +211,32 @@ def cmd_run(cfg: dict, args) -> int:
     return 1 if failed else 0
 
 
+def baseline_fault(baseline) -> str:
+    """What is wrong with a parsed baseline file, or an empty string."""
+    if not isinstance(baseline, dict) or not isinstance(baseline.get("medians"), dict):
+        return "not a baseline: no medians object"
+    for name, value in baseline["medians"].items():
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+            return f"median for {name!r} must be a number >= 0, got {value!r}"
+    return ""
+
+
 def cmd_report(cfg: dict, args) -> int:
     baseline_path = resolve(cfg, "baseline")
     if not baseline_path.is_file():
         print(f"FAIL {baseline_path}: no baseline yet - run `{args.prog} baseline` to freeze one")
         return 1
-    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
-    frozen = baseline.get("medians", {})
+    # A baseline the tool cannot read is a broken setup, not an alarm: exit 2.
+    try:
+        baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        print(f"FAIL {baseline_path}: unreadable baseline ({exc})", file=sys.stderr)
+        return 2
+    fault = baseline_fault(baseline)
+    if fault:
+        print(f"FAIL {baseline_path}: {fault}", file=sys.stderr)
+        return 2
+    frozen = baseline["medians"]
 
     now = args.now
     window = int(cfg["window_days"])
@@ -237,6 +256,10 @@ def cmd_report(cfg: dict, args) -> int:
             continue
         median, count = recent[name]
         base = frozen[name]
+        if base == 0:
+            # No percentage of zero means anything; say so rather than divide.
+            print(f"  WARN  {name:<24} baseline median is 0 ms - re-run `{args.prog} baseline`")
+            continue
         delta_pct = (median - base) / base * 100.0
         over = delta_pct > probe["threshold_pct"]
         alarms += over

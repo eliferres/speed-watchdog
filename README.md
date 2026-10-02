@@ -220,7 +220,7 @@ wrapper script can page on it. Exit codes across the board:
 |---|---|---|
 | 0 | Clean: no alarm, every probe ran. | stdout |
 | 1 | An alarm, a probe command that failed, or `report` with no baseline yet. | stdout |
-| 2 | The tool could not run: a missing or malformed config, a `--now` that is not an ISO date, or a command line it rejects. | stderr |
+| 2 | The tool could not run: a missing or malformed config, a `baseline.json` that will not parse or holds a non-number, a `--now` that is not an ISO date, or a command line it rejects. | stderr |
 
 ## What the report will not let you get away with
 
@@ -229,7 +229,9 @@ wrapper script can page on it. Exit codes across the board:
 - **A silent gap.** A probe with no runs in the window is printed as a
   `WARN` line, so a meter that quietly stopped shows up in the report.
   The verdict line and the exit code follow the thresholds only: a report
-  with `WARN` lines and no alarm still ends in `PASS` and exit 0.
+  with `WARN` lines and no alarm still ends in `PASS` and exit 0. A probe
+  whose baseline median is 0 ms also gets a `WARN` line, since no
+  percentage of zero means anything.
 - **A one-night fluke.** Two layers of median - across the K runs and
   across the window's days - stand between a slow night and an alarm.
 - **An unreadable history.** One JSON object per line, dated, with the
