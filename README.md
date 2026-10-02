@@ -4,9 +4,12 @@ An agent harness gets slow one small hook at a time, and six months later nobody
 
 Python 3.9+, standard library only, one file.
 
-<img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
-
 ![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
+![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)
+![dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
+
+<img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
 
 ## Install
 
