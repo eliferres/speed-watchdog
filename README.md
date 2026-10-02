@@ -65,9 +65,9 @@ arrives with a probe. The tool cannot enforce that part; you do.
 
 ## Walkthrough: catching a slow hook
 
-Every command below runs from a fresh clone with no setup. There is no
-animated demo on purpose: the demo is executable, so you can check these
-numbers instead of watching them.
+Every command below runs from a fresh clone with no setup. The picture
+at the top of this page is steps 1 and 2; running them yourself is how
+you check the numbers rather than take them from a picture.
 
 **1. Lint the config.** What each probe measures, in plain words, and
 where it alarms:

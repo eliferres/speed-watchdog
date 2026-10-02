@@ -6,6 +6,7 @@
 - Installable with `pipx install git+https://github.com/eliferres/speed-watchdog`, which puts a `speed-watchdog` command on your path; `speed-watchdog --version` prints the version.
 
 ### Fixed
+- The walkthrough no longer says the README has no demo picture; it now says the picture at the top shows its first two steps.
 - The demo transcript and the terminal picture now show the report's full output, including the payload_check line that was missing, and a test replays every demo command to keep them honest.
 - The demo picture no longer cuts its long lines off at the right edge: rows wider than the box ran past it mid-word with no ellipsis. Only the drawing changed; the recorded session is untouched.
 
