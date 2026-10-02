@@ -214,10 +214,13 @@ A nightly `run`, and a `report` that anyone will see when it fails:
 ```
 
 `report` exits 1 on any alarm, so cron mails it, CI fails on it, and a
-wrapper script can page on it. Exit codes across the board: 0 clean, 1
-for an alarm, a broken probe command, a malformed config, or a missing
-baseline, and 2 for a command line argparse rejects, such as an unknown
-subcommand or flag.
+wrapper script can page on it. Exit codes across the board:
+
+| Exit | Meaning | Printed on |
+|---|---|---|
+| 0 | Clean: no alarm, every probe ran. | stdout |
+| 1 | An alarm, a probe command that failed, or `report` with no baseline yet. | stdout |
+| 2 | The tool could not run: a missing or malformed config, a `--now` that is not an ISO date, or a command line it rejects. | stderr |
 
 ## What the report will not let you get away with
 

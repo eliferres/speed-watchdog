@@ -92,7 +92,7 @@ def read_config(path: Path):
 
     errors = validate_config(raw)
     if errors:
-        return None, errors
+        return None, [f"{path}: {line}" for line in errors]
 
     cfg = dict(DEFAULTS)
     cfg.update(raw)
@@ -346,16 +346,18 @@ def main(argv=None) -> int:
         try:
             args.now = parse_ts(args.now)
         except ValueError:
-            print(f"FAIL --now: not an ISO date: {args.now}")
-            return 1
+            print(f"FAIL --now: not an ISO date: {args.now}", file=sys.stderr)
+            return 2
     elif hasattr(args, "now"):
         args.now = datetime.now()
 
+    # Exit 1 means a probe got slower or failed; a config the tool cannot read
+    # is exit 2 on stderr, so a scheduler can tell "slower" from "broken".
     cfg, errors = read_config(args.config)
     if errors:
         for line in errors:
-            print(f"FAIL {line}")
-        return 1
+            print(f"FAIL {line}", file=sys.stderr)
+        return 2
     return COMMANDS[args.command](cfg, args)
 
 

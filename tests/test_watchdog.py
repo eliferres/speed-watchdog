@@ -61,6 +61,17 @@ def run_cli(*argv):
     return code, buffer.getvalue()
 
 
+def run_cli_streams(*argv):
+    """Runs main() in-process and returns (exit_code, stdout, stderr)."""
+    from contextlib import redirect_stderr, redirect_stdout
+    from io import StringIO
+
+    out, err = StringIO(), StringIO()
+    with redirect_stdout(out), redirect_stderr(err):
+        code = speed_watchdog.main(list(argv))
+    return code, out.getvalue(), err.getvalue()
+
+
 class WatchdogTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -223,9 +234,30 @@ class WatchdogTest(unittest.TestCase):
     def test_validate_rejects_broken_json(self):
         path = self.root / "watchdog.json"
         path.write_text("{not json", encoding="utf-8")
-        code, out = run_cli("validate", "--config", str(path))
-        self.assertEqual(code, 1)
-        self.assertIn("invalid JSON", out)
+        code, out, err = run_cli_streams("validate", "--config", str(path))
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertIn("invalid JSON", err)
+
+    def test_a_broken_config_exits_2_on_stderr_for_every_command(self):
+        # Exit 1 means "slower"; a scheduler must be able to tell broken from slower.
+        bad = self.root / "bad.json"
+        bad.write_text(json.dumps({"probes": [{"name": "a", "command": ""}]}), encoding="utf-8")
+        for command in ("validate", "run", "report", "baseline", "trend"):
+            for config in (bad, self.root / "missing.json"):
+                with self.subTest(command=command, config=config.name):
+                    code, out, err = run_cli_streams(command, "--config", str(config))
+                    self.assertEqual(code, 2)
+                    self.assertEqual(out, "")
+                    self.assertIn(str(config), err)
+
+    def test_a_bad_now_exits_2_on_stderr(self):
+        config = write_config(self.root)
+        code, out, err = run_cli_streams("report", "--config", str(config), "--now", "June 12")
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertEqual(1, len(err.splitlines()))
+        self.assertIn("--now", err)
 
     def test_validate_rejects_malformed_probes(self):
         cases = {
