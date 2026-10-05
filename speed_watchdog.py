@@ -24,6 +24,7 @@ __version__ = "1.1.0"
 
 import argparse
 import json
+import math
 import statistics
 import subprocess
 import sys
@@ -46,6 +47,12 @@ LEVELS = "._-=+*#"
 
 # ---------- config ----------
 
+def finite_number(value) -> bool:
+    # JSON readers accept NaN and Infinity, and NaN compares false with every
+    # threshold, so a NaN anywhere in the arithmetic would silence alarms.
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
 def validate_config(raw: dict) -> list[str]:
     errors = []
     probes = raw.get("probes")
@@ -53,8 +60,11 @@ def validate_config(raw: dict) -> list[str]:
         return ["probes: must be a non-empty list"]
 
     for key in ("runs_per_probe", "window_days", "timeout_s"):
-        if key in raw and (not isinstance(raw[key], (int, float)) or raw[key] < 1):
+        if key in raw and (not finite_number(raw[key]) or raw[key] < 1):
             errors.append(f"{key}: must be a number >= 1, got {raw[key]!r}")
+    for key in ("history", "baseline"):
+        if key in raw and (not isinstance(raw[key], str) or not raw[key].strip()):
+            errors.append(f"{key}: must be a path, got {raw[key]!r}")
 
     seen = set()
     for i, probe in enumerate(probes):
@@ -72,7 +82,7 @@ def validate_config(raw: dict) -> list[str]:
         if not isinstance(probe.get("command"), str) or not probe["command"].strip():
             errors.append(f"{where}: command must be a non-empty string")
         threshold = probe.get("threshold_pct")
-        if not isinstance(threshold, (int, float)) or isinstance(threshold, bool) or threshold <= 0:
+        if not finite_number(threshold) or threshold <= 0:
             errors.append(f"{where}: threshold_pct must be a number > 0, got {threshold!r}")
         if "unit" in probe and not isinstance(probe["unit"], str):
             errors.append(f"{where}: unit must be a string")
@@ -125,6 +135,8 @@ def read_history(path: Path) -> list[dict]:
         try:
             entry = json.loads(line)
             entry["_ts"] = parse_ts(entry["ts"])
+            if not finite_number(entry["median_ms"]):
+                continue
         except (json.JSONDecodeError, KeyError, TypeError, ValueError):
             # A run killed mid-append leaves a torn last line. Losing one
             # sample is fine; refusing to report for a week is not.
@@ -218,7 +230,7 @@ def baseline_fault(baseline) -> str:
     if not isinstance(baseline, dict) or not isinstance(baseline.get("medians"), dict):
         return "not a baseline: no medians object"
     for name, value in baseline["medians"].items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+        if not finite_number(value) or value < 0:
             return f"median for {name!r} must be a number >= 0, got {value!r}"
     return ""
 

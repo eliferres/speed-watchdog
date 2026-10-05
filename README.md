@@ -186,7 +186,10 @@ trimmed to one probe:
 ```
 
 `name`, `command`, and `threshold_pct` are required; everything else has
-the default shown above. Paths are relative to the config file, and
+the default shown above. Numbers must be finite: a `NaN` or `Infinity`,
+which JSON readers accept, compares false against every threshold and
+would silence the alarm, so the config is refused instead. A history
+row with such a median is skipped like a torn line. Paths are relative to the config file, and
 commands run with the config file's directory as their working
 directory, so a checked-in config works from anywhere.
 

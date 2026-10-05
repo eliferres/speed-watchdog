@@ -282,6 +282,44 @@ class WatchdogTest(unittest.TestCase):
         self.assertEqual(1, len(err.splitlines()))
         self.assertIn(str(path), err)
 
+    def test_non_finite_numbers_and_non_text_paths_are_config_errors(self):
+        # NaN compares false with everything, so a NaN threshold never alarms.
+        probe = '{"name": "fast", "command": ":", "threshold_pct": %s}'
+        bodies = {
+            "threshold NaN": '{"probes": [%s]}' % (probe % "NaN"),
+            "threshold Infinity": '{"probes": [%s]}' % (probe % "Infinity"),
+            "window Infinity": '{"window_days": Infinity, "probes": [%s]}' % (probe % "20"),
+            "runs NaN": '{"runs_per_probe": NaN, "probes": [%s]}' % (probe % "20"),
+            "baseline number": '{"baseline": 5, "probes": [%s]}' % (probe % "20"),
+            "history blank": '{"history": "", "probes": [%s]}' % (probe % "20"),
+        }
+        path = self.root / "watchdog.json"
+        for label, body in bodies.items():
+            with self.subTest(label):
+                path.write_text(body, encoding="utf-8")
+                code, out, err = run_cli_streams("report", "--config", str(path), "--now", "2026-06-12")
+                self.assertEqual((code, out), (2, ""))
+                self.assertNotIn("Traceback", err)
+
+    def test_non_finite_baseline_median_exits_2(self):
+        config = write_config(self.root)
+        write_history(self.root, [("2026-06-12T02:00:00", "fast", 13.0)])
+        (self.root / "baseline.json").write_text('{"medians": {"fast": NaN}}', encoding="utf-8")
+        code, out, err = run_cli_streams("report", "--config", str(config), "--now", "2026-06-12")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("fast", err)
+
+    def test_non_finite_history_row_is_skipped_not_averaged(self):
+        config = write_config(self.root)
+        (self.root / "history.jsonl").write_text(
+            '{"ts": "2026-06-11T02:00:00", "probe": "fast", "median_ms": NaN, "runs": 3}\n'
+            '{"ts": "2026-06-12T02:00:00", "probe": "fast", "median_ms": 13.0, "runs": 3}\n',
+            encoding="utf-8")
+        write_baseline(self.root, {"fast": 10.0})
+        code, out = run_cli("report", "--config", str(config), "--now", "2026-06-12")
+        self.assertEqual(code, 1, out)
+        self.assertIn("ALARM fast", out)
+
     def test_a_bad_now_exits_2_on_stderr(self):
         config = write_config(self.root)
         code, out, err = run_cli_streams("report", "--config", str(config), "--now", "June 12")

@@ -6,6 +6,7 @@
 - Installable with `pipx install git+https://github.com/eliferres/speed-watchdog`, which puts a `speed-watchdog` command on your path; `speed-watchdog --version` prints the version.
 
 ### Fixed
+- A `NaN` or `Infinity` in the config, the baseline or a history row no longer silences alarms: the config and baseline are refused with exit 2 and the history row is skipped; `history` and `baseline` must be paths, so `"baseline": 5` is refused too.
 - A config file that cannot be read or is not UTF-8 no longer crashes with a traceback: it prints one line on stderr naming the file and exits 2.
 - `report` no longer crashes on a probe whose baseline median is 0 ms: it prints a `WARN` line for that probe and skips the percentage.
 - `report` with a `baseline.json` that will not parse, or that holds a median that is not a number, no longer crashes with a traceback: it prints one line on stderr naming the file and exits 2.
