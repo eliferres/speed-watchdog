@@ -87,6 +87,8 @@ def read_config(path: Path):
         raw = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         return None, [f"{path}: invalid JSON ({exc})"]
+    except (OSError, ValueError) as exc:  # unreadable, or not UTF-8
+        return None, [f"{path}: unreadable config ({exc})"]
     if not isinstance(raw, dict):
         return None, [f"{path}: top level must be an object"]
 

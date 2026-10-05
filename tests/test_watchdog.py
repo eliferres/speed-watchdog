@@ -274,6 +274,14 @@ class WatchdogTest(unittest.TestCase):
                     self.assertEqual(out, "")
                     self.assertIn(str(config), err)
 
+    def test_an_unreadable_config_exits_2_on_one_line(self):
+        path = self.root / "watchdog.json"
+        path.write_bytes(b'{"probes": "\xff\xfe"}')
+        code, out, err = run_cli_streams("validate", "--config", str(path))
+        self.assertEqual((code, out), (2, ""))
+        self.assertEqual(1, len(err.splitlines()))
+        self.assertIn(str(path), err)
+
     def test_a_bad_now_exits_2_on_stderr(self):
         config = write_config(self.root)
         code, out, err = run_cli_streams("report", "--config", str(config), "--now", "June 12")
