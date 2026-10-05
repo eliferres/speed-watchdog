@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+Nothing yet.
+
+## [1.2.0](https://github.com/eliferres/speed-watchdog/releases/tag/v1.2.0) - 2026-10-02
+
 ### Added
 - Installable with `pipx install git+https://github.com/eliferres/speed-watchdog`, which puts a `speed-watchdog` command on your path; `speed-watchdog --version` prints the version.
 
