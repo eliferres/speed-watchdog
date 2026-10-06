@@ -1,8 +1,6 @@
 # speed-watchdog
 
-An agent harness gets slow one small hook at a time, and six months later nobody can say when it happened. speed-watchdog is the meter. Probes are plain commands timed by wall clock, medians are compared against a baseline that moves only when you say so, and the day something gets slower it exits non-zero.
-
-Python 3.9+, standard library only, one file.
+speed-watchdog times probe commands against a baseline and exits non-zero the day something in your agent harness gets slower. Python 3.9+, standard library only, one file.
 
 ![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
 ![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -10,6 +8,10 @@ Python 3.9+, standard library only, one file.
 ![dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 
 <img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
+
+## What it does
+
+An agent harness gets slow one small hook at a time, and six months later nobody can say when it happened. speed-watchdog is the meter. Probes are plain commands timed by wall clock, medians are compared against a baseline that moves only when you say so, and the day something gets slower it exits non-zero.
 
 ## Install
 
