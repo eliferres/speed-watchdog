@@ -2,12 +2,14 @@
 
 speed-watchdog times probe commands against a baseline and exits non-zero the day something in your agent harness gets slower. Python 3.9+, standard library only, one file.
 
-![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)
+[![ci](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml/badge.svg)](https://github.com/eliferres/speed-watchdog/actions/workflows/ci.yml)
 ![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)
 ![dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 
 <img src="demo/terminal.svg" width="660" alt="Terminal session showing speed-watchdog catching one hook thirty-four percent slower than its frozen baseline while two others stay flat.">
+
+The [fde-agent-skills](https://github.com/eliferres/fde-agent-skills) library documents the working methods behind this tool and its sibling tools as agent skills.
 
 ## What it does
 
